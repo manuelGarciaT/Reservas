@@ -36,11 +36,17 @@ app:
   kafka:
     reservation-events-topic: reservation-events
 
+# Vacio por defecto: Feign resuelve resource-service via Eureka. Sobreescribir con
+# RESOURCE_SERVICE_URL en despliegues sin discovery-server (ver resource-service/README).
+resource-service:
+  url: ${RESOURCE_SERVICE_URL:}
+
 server:
-  port: 8083
+  port: ${PORT:8083}
 
 eureka:
   client:
+    enabled: ${EUREKA_ENABLED:true}
     service-url:
       defaultZone: ${EUREKA_URL:http://localhost:8761/eureka}
   instance:

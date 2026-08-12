@@ -2,4 +2,46 @@ spring:
   application:
     name: api-gateway
   config:
-    import: configserver:${CONFIG_SERVER_URL:http://localhost:8888}
+    import: optional:configserver:${CONFIG_SERVER_URL:http://localhost:8888}
+  cloud:
+    gateway:
+      routes:
+        - id: user-service
+          uri: ${USER_SERVICE_URL:lb://user-service}
+          predicates:
+            - Path=/api/auth/**,/api/users/**
+          filters:
+            - RewritePath=/api/(?<segment>.*), /${segment}
+        - id: resource-service
+          uri: ${RESOURCE_SERVICE_URL:lb://resource-service}
+          predicates:
+            - Path=/api/resources/**
+          filters:
+            - RewritePath=/api/(?<segment>.*), /${segment}
+        - id: reservation-service
+          uri: ${RESERVATION_SERVICE_URL:lb://reservation-service}
+          predicates:
+            - Path=/api/reservations/**
+          filters:
+            - RewritePath=/api/(?<segment>.*), /${segment}
+        - id: notification-service
+          uri: ${NOTIFICATION_SERVICE_URL:lb://notification-service}
+          predicates:
+            - Path=/api/notifications/**
+          filters:
+            - RewritePath=/api/(?<segment>.*), /${segment}
+
+app:
+  jwt:
+    secret: ${JWT_SECRET:dev-only-secret-key-change-me-please-1234567890}
+
+server:
+  port: ${PORT:8080}
+
+eureka:
+  client:
+    enabled: ${EUREKA_ENABLED:true}
+    service-url:
+      defaultZone: ${EUREKA_URL:http://localhost:8761/eureka}
+  instance:
+    prefer-ip-address: true
